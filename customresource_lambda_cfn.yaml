@@ -1,0 +1,42 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: Creates a stack containing Eval CustomResource and Lambda
+
+Resources:
+#===============================================================
+#Custom Resource, permission and Lambda to update Bucket
+#PUT NotificationConfiguration
+#===============================================================
+  TestCustomResource1:
+    Type: 'AWS::CloudFormation::CustomResource'
+    DependsOn: TestCustomResourceLambda1
+    Version: '1.0'
+    Properties:
+      ServiceToken: !GetAtt TestCustomResourceLambda1.Arn
+      Param1: value1
+
+  TestCustomResourceLambda1:
+      Type: 'AWS::Lambda::Function'
+      Properties:
+        Handler: index.lambda_handler
+        FunctionName: TestCustomResourceLambda1
+        Runtime: python3.6
+        Code:
+          ZipFile: !Sub |
+            import json
+            import boto3
+            import cfnresponse
+
+            def lambda_handler(event, context):
+                responseData = { 'Data': 'responseData', 'Reason': 'Reason' }
+                try:
+                  print(json.dumps(event))
+                  cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)
+                except Exception as err:
+                  print(err)
+                  cfnresponse.send(event, context, cfnresponse.FAILED, responseData)
+        Description: 'TestCustomResourceLambda1'
+        MemorySize: 128
+        Timeout: 10
+        Role: arn:aws:iam::431307104808:role/AWSCISLambdaRole
