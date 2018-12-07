@@ -1,0 +1,14 @@
+import logging
+import string
+import os
+import base64
+import hashlib
+import http.client
+import urllib
+import json
+
+url = urllib.parse.urlparse('https://cloudformation-custom-resource-response-useast1.s3.amazonaws.com/arn%3Aaws%3Acloudformation%3Aus-east-1%3A979515726254%3Astack/CISRemedy/74bce850-fa38-11e8-9ef9-0eb8ff60a84c%7CCustomPUTNotifyConfig%7C84418836-c56e-4d59-a2d9-cc12edaab482?AWSAccessKeyId=AKIAIPVEIALGIZT7VPBQ&Expires=1544205336&Signature=PQR1nq3Mdl098uygnn6lreo%2FNJQ%3D')
+body = {}
+body['Status'] = 'FAILED'
+https = http.client.HTTPSConnection(url.hostname)
+https.request('PUT', url.path + '?' + url.query, json.dumps(body))
